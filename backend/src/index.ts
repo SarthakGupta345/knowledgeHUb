@@ -24,8 +24,7 @@ app.use(express.urlencoded({
 
 app.get("/", (req, res) => {
     res.send("Hello TypeScript");
-});some changes
-
+});
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
