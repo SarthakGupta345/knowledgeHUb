@@ -1,12 +1,12 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 interface IQuestion extends Document {
     title: string;
     content: string;
-    author: mongoose.Schema.Types.ObjectId;
-    comments: mongoose.Schema.Types.ObjectId[];
-    upvotes: mongoose.Schema.Types.ObjectId[];
-    downvotes: mongoose.Schema.Types.ObjectId[];
+    author: Types.ObjectId;
+    comments: Types.ObjectId[];
+    upvotes: Types.ObjectId[];
+    downvotes: Types.ObjectId[];
 }
 
 
@@ -47,6 +47,6 @@ const questionSchema = new mongoose.Schema<IQuestion>({
     timestamps: true
 });
 
-const Question = mongoose.model<Document>("Question");
+const Question = mongoose.model<IQuestion>("Question", questionSchema);
 
 export default Question;
