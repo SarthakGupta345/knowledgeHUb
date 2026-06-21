@@ -1,13 +1,13 @@
 import { NextFunction, Response, Request } from "express";
 import jwt from "jsonwebtoken";
+import { Types } from "mongoose";
 
 interface User {
-    _id: string;
+    _id: Types.ObjectId;
     email: string;
-    name: string;
 }
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
     user: User;
 }
 
