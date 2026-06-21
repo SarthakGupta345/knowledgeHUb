@@ -7,7 +7,7 @@ const router = Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", loginMiddleware, logout);
-router.put("/update", loginMiddleware,updateDetails );
+router.put("/update", loginMiddleware, updateDetails);
 
 
 export default router;
