@@ -1,85 +1,101 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
-const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        required: true,
-        trim: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    followers:[
-        {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : "User",
-        }
-    ],
-    about:{
-        type : String,
-        trim : true
-    },
-    location:{
-        type : String,
-        trim : true
-    },
-    college:{
-        type : String,
-        trim : true
-    },
-    branch:{
-        type : String,
-        trim : true
-    },
-    year:{
-        type : String,
-        trim : true
-    },
-    
-    following:[
-        {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : "User",
-        }
-    ],
-    bio: {
-        type: String,
-        trim: true
-    },
-    profilePicture: {
-        type: String,
-        trim: true
-    },
-    coverPicture: {
-        type: String,
-        trim: true
-    },
-    questions:[
-        {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : "Question",
-        }
-    ],
-    answers:[
-        {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : "Answer",
-        }
-    ],
-    posts:{
-        type : mongoose.Schema.Types.ObjectId,
-        ref : "Post",
-    },
-}, {
-    timestamps: true
-});
+export interface IUser extends Document {
+    name: string;
+    email: string;
+    password: string;
 
-const User = mongoose.model<Document>("User", userSchema);
+    followers: Types.ObjectId[];
+    following: Types.ObjectId[];
+
+    about?: string;
+    location?: string;
+    college?: string;
+    branch?: string;
+    year?: string;
+    bio?: string;
+
+    profilePicture?: string;
+    coverPicture?: string;
+
+    questions: Types.ObjectId[];
+    answers: Types.ObjectId[];
+    posts: Types.ObjectId[];
+}
+
+const userSchema = new mongoose.Schema<IUser>(
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true,
+        },
+
+        password: {
+            type: String,
+            required: true,
+            select: false,
+        },
+
+        followers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+
+        following: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+
+        about: String,
+        location: String,
+        college: String,
+        branch: String,
+        year: String,
+        bio: String,
+
+        profilePicture: String,
+        coverPicture: String,
+
+        questions: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Question",
+            },
+        ],
+
+        answers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Answer",
+            },
+        ],
+
+        posts: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Post",
+            },
+        ],
+    },
+    {
+        timestamps: true,
+    }
+);
+
+const User = mongoose.model<IUser>("User", userSchema);
+
+export default User;
 
