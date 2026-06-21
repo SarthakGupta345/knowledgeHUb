@@ -8,6 +8,7 @@ interface IPost extends Document {
     upvotes: mongoose.Schema.Types.ObjectId[];
     downvotes: mongoose.Schema.Types.ObjectId[];
 }
+
 const postSchema = new mongoose.Schema<IPost>({
     title: {
         type: String,
