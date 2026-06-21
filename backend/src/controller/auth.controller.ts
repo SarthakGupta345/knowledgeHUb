@@ -137,8 +137,6 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
-
-
 export const logout = async (
     req: Request,
     res: Response
@@ -163,3 +161,41 @@ export const logout = async (
         });
     }
 };
+
+export const updateDetails = async (req: Request, res: Response) => {
+    try {
+        const { bio, location, college, branch, year } = req.body;
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized",
+            });
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+        if (bio) user.bio = bio;
+        if (location) user.location = location;
+        if (college) user.college = college;
+        if (branch) user.branch = branch;
+        if (year) user.year = year;
+        await user.save();
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+        });
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+        });
+    }
+}   
