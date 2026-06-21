@@ -118,6 +118,7 @@ export const deletePost = async (
                 message: "Post not found",
             });
         }
+
         await User.findByIdAndUpdate(
             userId,
             {
@@ -167,6 +168,13 @@ export const upVotePost = async (
                 message: "Post not found",
             });
         }
+
+        if (post.upvotes.includes(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Post already upvoted",
+            });
+        }
         post.upvotes.push(userId);
         await post.save();
         return res.status(200).json({
@@ -210,6 +218,13 @@ export const downVotePost = async (
                 message: "Post not found",
             });
         }
+
+        if (post.downvotes.includes(userId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Post already downvoted",
+            });
+        }
         post.downvotes.push(userId);
         await post.save();
         return res.status(200).json({
@@ -233,10 +248,12 @@ export const updatePost = async (
 ) => {
     try {
         const userId = req.user._id;
-        if (!userId) {
-            return res.status(401).json({
+        const { title, content } = req.body;
+
+        if (!title?.trim() || !content?.trim()) {
+            return res.status(400).json({
                 success: false,
-                message: "Unauthorized",
+                message: "Title and content are required",
             });
         }
         const { postId } = req.params;
@@ -253,8 +270,14 @@ export const updatePost = async (
                 message: "Post not found",
             });
         }
-        post.title = req.body.title;
-        post.content = req.body.content;
+        if (post.author.toString() !== userId.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized",
+            });
+        }
+        post.title = title.trim();
+        post.content = content.trim();
         await post.save();
         return res.status(200).json({
             success: true,
