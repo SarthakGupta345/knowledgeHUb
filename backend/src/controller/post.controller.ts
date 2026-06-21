@@ -1,15 +1,15 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import Post from "../models/post.model";
-import { AuthenticatedRequest } from "../middleware/auth.middleware";
 import User from "../models/user.model";
+import CommentModel from "../models/comment.model";
 
 
 export const getAllPostsFromUser = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
 
         if (!userId) {
             return res.status(401).json({
@@ -42,11 +42,11 @@ export const getAllPostsFromUser = async (
 };
 
 export const createPost = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -93,11 +93,11 @@ export const createPost = async (
 };
 
 export const deletePost = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -143,11 +143,11 @@ export const deletePost = async (
 };
 
 export const upVotePost = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -193,11 +193,11 @@ export const upVotePost = async (
 };
 
 export const downVotePost = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -243,11 +243,17 @@ export const downVotePost = async (
 };
 
 export const updatePost = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized",
+            });
+        }
         const { title, content } = req.body;
 
         if (!title?.trim() || !content?.trim()) {
@@ -295,11 +301,11 @@ export const updatePost = async (
 };
 
 export const createComment = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -320,12 +326,12 @@ export const createComment = async (
                 message: "Post not found",
             });
         }
-        const comment = await Comment.create({
+        const comment = await CommentModel.create({
             content: req.body.content,
             author: userId,
-            post: postId,
+            post: postId as string,
         });
-        post.comments.push(comment._id);
+        post.comments.push(comment._id as any);
         await post.save();
         return res.status(200).json({
             success: true,
@@ -343,11 +349,11 @@ export const createComment = async (
 };
 
 export const deleteComment = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
         if (!userId) {
             return res.status(401).json({
                 success: false,
@@ -361,7 +367,7 @@ export const deleteComment = async (
                 message: "Comment ID is required",
             });
         }
-        const comment = await Comment.findByIdAndDelete(commentId);
+        const comment = await CommentModel.findByIdAndDelete(commentId as string);
         if (!comment) {
             return res.status(404).json({
                 success: false,
@@ -392,11 +398,11 @@ export const deleteComment = async (
 };
 
 export const getPostIndetails = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user?._id;
         if (!userId) {
             return res.status(401).json({
                 success: false,

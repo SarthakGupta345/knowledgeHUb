@@ -4,7 +4,7 @@ import User from "../models/user.model";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest } from "../middleware/auth.middleware";
 
-export const signup = async (req: AuthenticatedRequest, res: Response) => {
+export const signup = async (req: Request, res: Response) => {
     try {
         const { name, email, password } = req.body;
 
@@ -68,7 +68,7 @@ export const signup = async (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
-export const login = async (req: AuthenticatedRequest, res: Response) => {
+export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -140,7 +140,7 @@ export const login = async (req: AuthenticatedRequest, res: Response) => {
 
 
 export const logout = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response
 ) => {
     try {

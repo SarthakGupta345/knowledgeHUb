@@ -7,12 +7,20 @@ interface User {
     email: string;
 }
 
+declare global {
+    namespace Express {
+        interface Request {
+            user?: User;
+        }
+    }
+}
+
 export interface AuthenticatedRequest extends Request {
     user: User;
 }
 
 export const loginMiddleware = (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction
 ) => {
