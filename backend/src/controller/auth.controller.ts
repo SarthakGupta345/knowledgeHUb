@@ -40,7 +40,7 @@ export const signup = async (req: AuthenticatedRequest, res: Response) => {
             process.env.JWT_SECRET!,
             {
                 expiresIn: "7d",
-            }   
+            }
         );
 
         res.cookie("token", token, {
@@ -68,7 +68,7 @@ export const signup = async (req: AuthenticatedRequest, res: Response) => {
     }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -114,7 +114,15 @@ export const login = async (req: Request, res: Response) => {
 
         res.cookie("token", token, {
             httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
+
+        req.user = {
+            _id: user._id,
+            email: user.email,
+        };
 
         return res.status(200).json({
             success: true,
@@ -125,6 +133,33 @@ export const login = async (req: Request, res: Response) => {
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
+        });
+    }
+};
+
+
+
+export const logout = async (
+    req: AuthenticatedRequest,
+    res: Response
+) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully",
+        });
+    } catch (error) {
+        console.error("Logout Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong",
         });
     }
 };
