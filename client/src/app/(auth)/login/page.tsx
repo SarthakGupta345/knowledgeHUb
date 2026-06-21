@@ -2,13 +2,48 @@
 
 import React, { useState } from "react";
 import { Eye, EyeOff, BookOpen, ShieldCheck, Sparkles, Globe } from "lucide-react";
+import { useLogin } from "@/hooks/useUsers";
+import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
+    const [formData, setFormData] = useState({ email: "", password: "" });
+    const { mutate: login, isPending: isPendingLogin } = useLogin();
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        try {
+
+            login(formData, {
+                onSuccess: (data) => {
+                    console.log("Login Success Data:", data);
+                    toast.success("Login successful");
+                    router.push("/");
+                },
+                onError: (error) => {
+                    console.log("Login Error:", error);
+                    if (error) {
+                        setError(error.message);
+                    }
+                    toast.error(error?.message || "Failed to login. Please check your credentials.");
+                }
+            });
+
+        } catch (error) {
+            setError("Failed to login");
+            toast.error("Failed to login");
+        }
+    }
 
     return (
         <div className="min-h-screen h-screen w-full bg-slate-900 flex items-center justify-center overflow-hidden font-sans">
             <div className="w-full h-full bg-white grid lg:grid-cols-12">
+
+                {error && <Toaster position="top-center" />}
+
 
                 {/* Left Section (Premium & Classic Editorial Design) */}
                 <div className="hidden lg:flex lg:col-span-5 bg-[#0b0f19] text-slate-200 p-12 xl:p-16 flex-col justify-between h-full relative border-r border-slate-800/50">
@@ -90,13 +125,18 @@ const LoginPage = () => {
                             </p>
                         </div>
 
-                        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+                        <form
+                            onSubmit={handleSubmit}
+                            className="space-y-5"
+                        >
                             <div>
                                 <label className="block text-[11px] font-bold uppercase tracking-widest mb-2 text-slate-500">
                                     Email Address
                                 </label>
                                 <input
                                     type="email"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     placeholder="name@institution.com"
                                     className="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none transition font-light text-slate-800 placeholder-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                                 />
@@ -115,12 +155,15 @@ const LoginPage = () => {
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
+                                        value={formData.password}
+                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                         placeholder="••••••••••••"
                                         className="w-full px-4 py-3 border border-slate-200 rounded-lg outline-none transition font-light text-slate-800 placeholder-slate-300 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 pr-12"
                                     />
                                     <button
                                         type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
+                                        disabled={isPendingLogin}
+
                                         className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
                                     >
                                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -131,9 +174,10 @@ const LoginPage = () => {
                             <div className="pt-2">
                                 <button
                                     type="submit"
+                                    disabled={isPendingLogin}
                                     className="w-full bg-[#0b0f19] hover:bg-slate-800 text-white py-3.5 rounded-lg font-medium tracking-wide text-md transition-all duration-200 shadow-md active:scale-[0.99]"
                                 >
-                                    Login
+                                    {isPendingLogin ? "Login..." : "Login"}
                                 </button>
                             </div>
                         </form>

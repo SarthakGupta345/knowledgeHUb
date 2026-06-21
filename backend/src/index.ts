@@ -2,12 +2,14 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import connectDB from "./config/db";
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+connectDB()
 
 app.use(express.json());
 app.use(cookieParser())
